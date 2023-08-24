@@ -28,7 +28,7 @@ jobs:
           submodules: recursive
           fetch-depth: 0
       - run: mkdir public
-      - run: echo "default folder $GITHUB_ACTION_PATH"
+      - run: echo "default folder ${{github.ACTION_PATH}}"
       - run: ls /123
       - run: sudo apt-get update && sudo apt-get -y upgrade
       - run: sudo apt install -y build-essential debhelper dh-python git asciidoc intltool libpython3-dev libssl-dev libsystemd-dev python3-dev pkg-config systemd xsltproc docbook-xsl wget cargo intltool
