@@ -28,8 +28,8 @@ jobs:
           submodules: recursive
           fetch-depth: 0
       - run: mkdir public
-      - run: echo "defaultfolder${{ vars.GITHUB_ACTION_PATH }}"
-      - run: ls $GITHUB_ACTION_PATH 
+      - run: printf "$GITHUB_ACTION_PATH"
+      - run: ls $GITHUB_ACTION_PATH
       - run: sudo apt-get update && sudo apt-get -y upgrade
       - run: sudo apt install -y build-essential debhelper dh-python git asciidoc intltool libpython3-dev libssl-dev libsystemd-dev python3-dev pkg-config systemd xsltproc docbook-xsl wget cargo intltool
       - run: wget https://source.ipfire.org/releases/libloc/libloc-0.9.16.tar.gz
@@ -38,19 +38,17 @@ jobs:
       - working-directory: ./libloc-0.9.16
         run: ./autogen.sh
       - working-directory: ./libloc-0.9.16
-        run: ./configure CFLAGS='-g -O0' --prefix=/usr --sysconfdir=/etc --libdir=/usr/lib --with-database-path=${{env.working-directory}}/database.db
+        run: ./configure CFLAGS='-g -O0' --prefix=$GITHUB_ACTION_PATH --sysconfdir=/etc --libdir=$GITHUB_ACTION_PATH/lib --with-database-path=$GITHUB_ACTION_PATH/database.db
       - working-directory: ./libloc-0.9.16
         run: make
       - working-directory: ./libloc-0.9.16
-        run: sudo make install
-      - run: ls /usr/lib/python3.9/site-packages
+        run: make install
+      - run: ls $GITHUB_ACTION_PATH/lib/python3.8/site-packages
       - run: git clone --depth 1 https://git.torproject.org/tor.git
-      - run: PYTHONPATH=/usr/lib/python3.9/site-packages location --quiet update
-      - run: PYTHONPATH=/usr/lib/python3.9/site-packages location dump ${{env.working-directory}}/public/geoip-dump.txt
-      - run: version=$(date --date="$(PYTHONPATH=/usr/lib/python3.9/site-packages location version)" '+%Y%m%dT%H%m%SZ')
-      - working-directory: tor/scripts/maint/geoip/geoip-db-tool
-        run: cargo run --release -- -i ${{env.working-directory}}/public/geoip-dump.txt
-      - run: mv tor/scripts/maint/geoip/geoip-db-tool/geoip{,6} public/
-      - run: cp -r index.html countries.txt static public/
-      - run: sed -i "s,VERSION,${version}," public/index.html
-      - run: printf "$version" > public/version  
+      - run: PYTHONPATH=$GITHUB_ACTION_PATH/lib/python3.8/site-packages location --quiet update
+      - run: PYTHONPATH=$GITHUB_ACTION_PATH/lib/python3.8/site-packages location dump $GITHUB_ACTION_PATH/public/geoip-dump.txt
+      - run: version=$(date --date="$(PYTHONPATH=$GITHUB_ACTION_PATH/lib/python3.8/site-packages location version)" '+%Y%m%dT%H%m%SZ')
+      - working-directory: ./tor/scripts/maint/geoip/geoip-db-tool
+        run: cargo run --release -- -i $GITHUB_ACTION_PATH/public/geoip-dump.txt
+      - run: mv ./tor/scripts/maint/geoip/geoip-db-tool/geoip{,6} ./public/
+      - run: printf "$version" > ./public/version  
