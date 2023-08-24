@@ -18,7 +18,7 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     # CI project folder
     env:
@@ -47,10 +47,10 @@ jobs:
       - run: git clone --depth 1 https://git.torproject.org/tor.git
       - run: cd ${{env.working-directory}}
       - run: PYTHONPATH=/usr/lib/python3.9/site-packages location --quiet update
-      - run: PYTHONPATH=/usr/lib/python3.9/site-packages location dump $CI_PROJECT_DIR/public/geoip-dump.txt
+      - run: PYTHONPATH=/usr/lib/python3.9/site-packages location dump ${{env.working-directory}}/public/geoip-dump.txt
       - run: version=$(date --date="$(PYTHONPATH=/usr/lib/python3.9/site-packages location version)" '+%Y%m%dT%H%m%SZ')
       - run: pushd tor/scripts/maint/geoip/geoip-db-tool
-      - run: cargo run --release -- -i $CI_PROJECT_DIR/public/geoip-dump.txt
+      - run: cargo run --release -- -i ${{env.working-directory}}/public/geoip-dump.txt
       - run: popd
       - run: mv tor/scripts/maint/geoip/geoip-db-tool/geoip{,6} public/
       - run: cp -r index.html countries.txt static public/
