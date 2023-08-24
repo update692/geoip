@@ -37,19 +37,16 @@ jobs:
       - run: wget https://source.ipfire.org/releases/libloc/libloc-0.9.16.tar.gz
       - run: echo "2092361f0c76b31e65aed85692c56176996925e1cd5d78d113ab9c53ba27f3fc libloc-0.9.16.tar.gz" | sha256sum -c
       - run: tar xf libloc-0.9.16.tar.gz
-      - run: pwd
-      - run: ls
-      - run: pushd libloc-0.9.16
-      - run: pwd
-      - run: ls
-      - run: ./autogen.sh
-      - run: ./configure CFLAGS='-g -O0' --prefix=/usr --sysconfdir=/etc --libdir=/usr/lib --with-database-path=${{env.working-directory}}/database.db
-      - run: make
-      - run: make install
-      - run: popd
+      - working-directory: ./libloc-0.9.16
+        run: ./autogen.sh
+      - working-directory: ./libloc-0.9.16
+        run: ./configure CFLAGS='-g -O0' --prefix=/usr --sysconfdir=/etc --libdir=/usr/lib --with-database-path=${{env.working-directory}}/database.db
+      - working-directory: ./libloc-0.9.16
+        run: make
+      - working-directory: ./libloc-0.9.16
+        run: make install
       - run: ls /usr/lib/python3.9/site-packages
       - run: git clone --depth 1 https://git.torproject.org/tor.git
-      - run: cd ${{env.working-directory}}
       - run: PYTHONPATH=/usr/lib/python3.9/site-packages location --quiet update
       - run: PYTHONPATH=/usr/lib/python3.9/site-packages location dump ${{env.working-directory}}/public/geoip-dump.txt
       - run: version=$(date --date="$(PYTHONPATH=/usr/lib/python3.9/site-packages location version)" '+%Y%m%dT%H%m%SZ')
