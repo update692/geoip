@@ -44,10 +44,10 @@ jobs:
         run: sudo make install
       - run: git clone --depth 1 https://git.torproject.org/tor.git
       - run: pythonsite=$(python3 -m site --user-site)
-      - run: ls ${{ env.pythonsite }}
-      - run: PYTHONPATH=${{ env.pythonsite }} location --quiet update
-      - run: PYTHONPATH=${{ env.pythonsite }} location dump ${{ github.workspace }}/public/geoip-dump.txt
-      - run: version=$(date --date="$(PYTHONPATH=${{ env.pythonsite }} location version)" '+%Y%m%dT%H%m%SZ')
+      - run: ls $(pythonsite)
+      - run: PYTHONPATH=$(pythonsite) location --quiet update
+      - run: PYTHONPATH=$(pythonsite) location dump ${{ github.workspace }}/public/geoip-dump.txt
+      - run: version=$(date --date="$(PYTHONPATH=$(pythonsite) location version)" '+%Y%m%dT%H%m%SZ')
       - working-directory: ./tor/scripts/maint/geoip/geoip-db-tool
         run: cargo run --release -- -i ${{ github.workspace }}/public/geoip-dump.txt
       - run: mv ./tor/scripts/maint/geoip/geoip-db-tool/geoip{,6} ./public/
