@@ -38,6 +38,8 @@ jobs:
       - run: echo "2092361f0c76b31e65aed85692c56176996925e1cd5d78d113ab9c53ba27f3fc libloc-0.9.16.tar.gz" | sha256sum -c
       - run: tar xf libloc-0.9.16.tar.gz
       - run: pushd libloc-0.9.16
+      - run: pwd
+      - run: ls
       - run: ./autogen.sh
       - run: ./configure CFLAGS='-g -O0' --prefix=/usr --sysconfdir=/etc --libdir=/usr/lib --with-database-path=${{env.working-directory}}/database.db
       - run: make
