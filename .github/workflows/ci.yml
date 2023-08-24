@@ -22,7 +22,7 @@ jobs:
 
     # CI project folder
     env:
-      working-directory: .
+      working-directory: /home/runner/work/geoip/geoip
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -32,7 +32,7 @@ jobs:
           submodules: recursive
           fetch-depth: 0
       - run: mkdir public
-      - run: sudo apt update
+      - run: sudo apt-get update && sudo apt-get -y upgrade
       - run: sudo apt install -y build-essential debhelper dh-python git asciidoc intltool libpython3-dev libssl-dev libsystemd-dev python3-dev pkg-config systemd xsltproc docbook-xsl wget cargo intltool
       - run: wget https://source.ipfire.org/releases/libloc/libloc-0.9.16.tar.gz
       - run: echo "2092361f0c76b31e65aed85692c56176996925e1cd5d78d113ab9c53ba27f3fc libloc-0.9.16.tar.gz" | sha256sum -c
@@ -44,15 +44,14 @@ jobs:
       - working-directory: ./libloc-0.9.16
         run: make
       - working-directory: ./libloc-0.9.16
-        run: make install
+        run: sudo make install
       - run: ls /usr/lib/python3.9/site-packages
       - run: git clone --depth 1 https://git.torproject.org/tor.git
       - run: PYTHONPATH=/usr/lib/python3.9/site-packages location --quiet update
       - run: PYTHONPATH=/usr/lib/python3.9/site-packages location dump ${{env.working-directory}}/public/geoip-dump.txt
       - run: version=$(date --date="$(PYTHONPATH=/usr/lib/python3.9/site-packages location version)" '+%Y%m%dT%H%m%SZ')
-      - run: pushd tor/scripts/maint/geoip/geoip-db-tool
-      - run: cargo run --release -- -i ${{env.working-directory}}/public/geoip-dump.txt
-      - run: popd
+      - working-directory: tor/scripts/maint/geoip/geoip-db-tool
+        run: cargo run --release -- -i ${{env.working-directory}}/public/geoip-dump.txt
       - run: mv tor/scripts/maint/geoip/geoip-db-tool/geoip{,6} public/
       - run: cp -r index.html countries.txt static public/
       - run: sed -i "s,VERSION,${version}," public/index.html
