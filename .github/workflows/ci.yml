@@ -78,15 +78,14 @@ jobs:
 
       - name: Create Release
         id: create_release
-        uses: marvinpinto/action-automatic-releases@latest
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "${{ env.tagname }}"
-          title: "Release ${{ env.tagname }}"
+          tag_name: ${{ env.tagname }}
+          release_name: Release ${{ env.tagname }}
           draft: false
           prerelease: false
-          files: |
-            geoip.zip
 
 #      - name: Upload Release Asset
 #        id: upload-release-asset 
