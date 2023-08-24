@@ -61,7 +61,13 @@ jobs:
       - working-directory: ./tor/scripts/maint/geoip/geoip-db-tool
         run: cargo run --release -- -i ${{ github.workspace }}/public/geoip-dump.txt
       - run: mv ./tor/scripts/maint/geoip/geoip-db-tool/geoip{,6} ./public/
-      - run: printf "$version" > ./public/version
+      - run: printf "$version" > ./version
+      - run: cp ./version ./public/
+      - name: Commit and push changes
+        uses: EndBug/add-and-commit@v7
+        with:
+          message: 'Action'
+          add: 'version'
       - run: rm ./public/geoip-dump.txt
       - run: ls ./public
 
@@ -70,22 +76,23 @@ jobs:
 
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        uses: marvinpinto/action-automatic-releases@latest
         with:
-          tag_name: ${{ env.tagname }}
-          release_name: Release ${{ env.tagname }}
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: ${{ env.tagname }}
+          title: "Release ${{ env.tagname }}"
           draft: false
           prerelease: false
+          files: |
+            geoip.zip
 
-      - name: Upload Release Asset
-        id: upload-release-asset 
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} 
-          asset_path: ./geoip.zip
-          asset_name: geoip.zip
-          asset_content_type: application/zip
+#      - name: Upload Release Asset
+#        id: upload-release-asset 
+#        uses: actions/upload-release-asset@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          upload_url: ${{ steps.create_release.outputs.upload_url }} 
+#          asset_path: ./geoip.zip
+#          asset_name: geoip.zip
+#          asset_content_type: application/zip
