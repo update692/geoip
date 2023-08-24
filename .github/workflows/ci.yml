@@ -55,13 +55,13 @@ jobs:
       - run: ls ${{ env.pythonsite }}
       - run: PYTHONPATH=${{ env.pythonsite }} location --quiet update
       - run: PYTHONPATH=${{ env.pythonsite }} location dump ${{ github.workspace }}/public/geoip-dump.txt
-      - run: version=$(date --date="$(PYTHONPATH=/usr/lib/python3.10/site-packages location version)" '+%Y%m%dT%H%m%SZ')
-      - name: Set tagname env variable
-        run: echo "tagname=$version" >> $GITHUB_ENV
+      #- run: version=$(date --date="$(PYTHONPATH=/usr/lib/python3.10/site-packages location version)" '+%Y%m%dT%H%m%SZ')
+      - name: Set version env variable
+        run: echo "version=$(date --date="$(PYTHONPATH=/usr/lib/python3.10/site-packages location version)" '+%Y%m%dT%H%m%SZ')" >> $GITHUB_ENV
       - working-directory: ./tor/scripts/maint/geoip/geoip-db-tool
         run: cargo run --release -- -i ${{ github.workspace }}/public/geoip-dump.txt
       - run: mv ./tor/scripts/maint/geoip/geoip-db-tool/geoip{,6} ./public/
-      - run: echo $version > ./version
+      - run: echo ${{env.version}} > ./version
       - run: cp ./version ./public/
 
       - name: Commit and push changes
@@ -78,14 +78,15 @@ jobs:
 
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        uses: marvinpinto/action-automatic-releases@latest
         with:
-          tag_name: ${{ env.tagname }}
-          release_name: Release ${{ env.tagname }}
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "${{ env.tagname }}"
+          title: "Release ${{ env.tagname }}"
           draft: false
           prerelease: false
+          files: |
+            geoip.zip
 
 #      - name: Upload Release Asset
 #        id: upload-release-asset 
