@@ -75,7 +75,7 @@ jobs:
       - run: ls ./public
 
       - name: Zip folder
-        run: zip -r -q ./geoip.zip ./public/*
+        run: zip -r -q -j ./geoip.zip ./public/
 
       - name: Create Release
         id: create_release
