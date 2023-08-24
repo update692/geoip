@@ -19,8 +19,8 @@ jobs:
   build:
     runs-on: ubuntu-22.04
 
-    #env:
-    #  pythonsite: /usr/lib/python3.10/site-packages
+    env:
+      pythonsite: /usr/lib/python3.10/site-packages
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -30,8 +30,8 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      - name: Set pythonsite env variable
-        run: echo "pythonsite=$(python3 -m site --user-site)" >> $GITHUB_ENV
+      #- name: Set pythonsite env variable
+      #  run: echo "pythonsite=$(python3 -m site --user-site)" >> $GITHUB_ENV
 
       - run: mkdir public
       - run: ls ${{ github.workspace }}
