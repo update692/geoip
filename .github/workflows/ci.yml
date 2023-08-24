@@ -18,11 +18,7 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
-
-    # CI project folder
-    env:
-      working-directory: /home/runner/work/geoip/geoip
+    runs-on: ubuntu-22.04
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -32,8 +28,7 @@ jobs:
           submodules: recursive
           fetch-depth: 0
       - run: mkdir public
-      - run: echo "hello ${{github.workspace}}"
-      - run: ls ${{env.working-directory}}
+      - run: ls ${{github.workspace}}
       - run: sudo apt-get update
       - run: sudo apt install -y build-essential debhelper dh-python git asciidoc intltool libpython3-dev libssl-dev libsystemd-dev python3-dev pkg-config systemd xsltproc docbook-xsl wget cargo
       - run: wget https://source.ipfire.org/releases/libloc/libloc-0.9.16.tar.gz
@@ -42,19 +37,44 @@ jobs:
       - working-directory: ./libloc-0.9.16
         run: ./autogen.sh
       - working-directory: ./libloc-0.9.16
-        run: ./configure CFLAGS='-g -O0' --prefix=${{env.working-directory}} --sysconfdir=/etc --libdir=${{env.working-directory}}/lib --with-database-path=${{env.working-directory}}/database.db
+        run: ./configure CFLAGS='-g -O0' --prefix=/usr --sysconfdir=/etc --libdir=/usr/lib --with-database-path=${{github.workspace}}/database.db
       - working-directory: ./libloc-0.9.16
         run: make
       - working-directory: ./libloc-0.9.16
         run: sudo make install
       - run: git clone --depth 1 https://git.torproject.org/tor.git
-      - run: ls ${{env.working-directory}}/lib/python3.10/site-packages
-      - run: PYTHONPATH=${{env.working-directory}}/lib/python3.10/site-packages ./bin/location --quiet update
-      - run: PYTHONPATH=${{env.working-directory}}/lib/python3.10/site-packages ./bin/location dump ${{env.working-directory}}/public/geoip-dump.txt
-      - run: version=$(date --date="$(PYTHONPATH=${{env.working-directory}}/lib/python3.10/site-packages ./bin/location version)" '+%Y%m%dT%H%m%SZ')
+      - run: ls /usr/lib/python3.10/site-packages
+      - run: PYTHONPATH=/usr/lib/python3.10/site-packages location --quiet update
+      - run: PYTHONPATH=/usr/lib/python3.10/site-packages location dump ${{github.workspace}}/public/geoip-dump.txt
+      - run: version=$(date --date="$(PYTHONPATH=${/usr/lib/python3.10/site-packages location version)" '+%Y%m%dT%H%m%SZ')
       - working-directory: ./tor/scripts/maint/geoip/geoip-db-tool
-        run: cargo run --release -- -i ${{env.working-directory}}/public/geoip-dump.txt
+        run: cargo run --release -- -i ${{github.workspace}}/public/geoip-dump.txt
       - run: mv ./tor/scripts/maint/geoip/geoip-db-tool/geoip{,6} ./public/
       - run: printf "$version" > ./public/version
       - run: rm ./public/geoip-dump.txt
       - run: ls ./public
+
+      - name: Zip folder
+        run: zip -r -q ./geoip.zip ./public
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} 
+          asset_path: ./geoip.zip
+          asset_name: geoip.zip
+          asset_content_type: application/zip
