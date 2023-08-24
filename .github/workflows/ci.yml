@@ -17,8 +17,10 @@ on:
 jobs:
   # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
     runs-on: ubuntu-22.04
+
+    #env:
+    #  pythonsite: /usr/lib/python3.10/site-packages
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -27,6 +29,10 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 0
+
+      - name: Set pythonsite env variable
+        run: echo "pythonsite=$(python3 -m site --user-site)" >> $GITHUB_ENV
+
       - run: mkdir public
       - run: ls ${{ github.workspace }}
       - run: sudo apt-get update
@@ -43,11 +49,11 @@ jobs:
       - working-directory: ./libloc-0.9.16
         run: sudo make install
       - run: git clone --depth 1 https://git.torproject.org/tor.git
-      - run: pythonsite=$(python3 -m site --user-site)
-      - run: ls $(pythonsite)
-      - run: PYTHONPATH=$(pythonsite) location --quiet update
-      - run: PYTHONPATH=$(pythonsite) location dump ${{ github.workspace }}/public/geoip-dump.txt
-      - run: version=$(date --date="$(PYTHONPATH=$(pythonsite) location version)" '+%Y%m%dT%H%m%SZ')
+
+      - run: ls ${{ env.pythonsite }}
+      - run: PYTHONPATH=${{ env.pythonsite }} location --quiet update
+      - run: PYTHONPATH=${{ env.pythonsite }} location dump ${{ github.workspace }}/public/geoip-dump.txt
+      - run: version=$(date --date="$(PYTHONPATH=${{ env.pythonsite }} location version)" '+%Y%m%dT%H%m%SZ')
       - working-directory: ./tor/scripts/maint/geoip/geoip-db-tool
         run: cargo run --release -- -i ${{ github.workspace }}/public/geoip-dump.txt
       - run: mv ./tor/scripts/maint/geoip/geoip-db-tool/geoip{,6} ./public/
