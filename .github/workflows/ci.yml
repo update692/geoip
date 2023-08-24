@@ -55,19 +55,21 @@ jobs:
       - run: ls ${{ env.pythonsite }}
       - run: PYTHONPATH=${{ env.pythonsite }} location --quiet update
       - run: PYTHONPATH=${{ env.pythonsite }} location dump ${{ github.workspace }}/public/geoip-dump.txt
-      - run: version=$(date --date="$(PYTHONPATH=${{ env.pythonsite }} location version)" '+%Y%m%dT%H%m%SZ')
+      - run: version=$(date --date="$(PYTHONPATH=/usr/lib/python3.10/site-packages location version)" '+%Y%m%dT%H%m%SZ')
       - name: Set tagname env variable
         run: echo "tagname=$version" >> $GITHUB_ENV
       - working-directory: ./tor/scripts/maint/geoip/geoip-db-tool
         run: cargo run --release -- -i ${{ github.workspace }}/public/geoip-dump.txt
       - run: mv ./tor/scripts/maint/geoip/geoip-db-tool/geoip{,6} ./public/
-      - run: printf "$version" > ./version
+      - run: echo $version > ./version
       - run: cp ./version ./public/
+
       - name: Commit and push changes
         uses: EndBug/add-and-commit@v7
         with:
           message: 'Action'
           add: 'version'
+
       - run: rm ./public/geoip-dump.txt
       - run: ls ./public
 
@@ -79,7 +81,7 @@ jobs:
         uses: marvinpinto/action-automatic-releases@latest
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: ${{ env.tagname }}
+          automatic_release_tag: "${{ env.tagname }}"
           title: "Release ${{ env.tagname }}"
           draft: false
           prerelease: false
