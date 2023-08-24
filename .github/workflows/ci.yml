@@ -43,10 +43,11 @@ jobs:
       - working-directory: ./libloc-0.9.16
         run: sudo make install
       - run: git clone --depth 1 https://git.torproject.org/tor.git
-      - run: ls /usr/lib/python3.10/site-packages
-      - run: PYTHONPATH=/usr/lib/python3.10/site-packages location --quiet update
-      - run: PYTHONPATH=/usr/lib/python3.10/site-packages location dump ${{github.workspace}}/public/geoip-dump.txt
-      - run: version=$(date --date="$(PYTHONPATH=${/usr/lib/python3.10/site-packages location version)" '+%Y%m%dT%H%m%SZ')
+      - run: pythonsite=$(python -m site --user-site)
+      - run: ls $pythonsite
+      - run: PYTHONPATH=$pythonsite location --quiet update
+      - run: PYTHONPATH=$pythonsite location dump ${{github.workspace}}/public/geoip-dump.txt
+      - run: version=$(date --date="$(PYTHONPATH=$pythonsite location version)" '+%Y%m%dT%H%m%SZ')
       - working-directory: ./tor/scripts/maint/geoip/geoip-db-tool
         run: cargo run --release -- -i ${{github.workspace}}/public/geoip-dump.txt
       - run: mv ./tor/scripts/maint/geoip/geoip-db-tool/geoip{,6} ./public/
