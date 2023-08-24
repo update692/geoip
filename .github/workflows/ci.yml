@@ -20,6 +20,10 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
+    # CI project folder
+    env:
+      working-directory: /home/runner/work/geoip/geoip
+
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -28,27 +32,26 @@ jobs:
           submodules: recursive
           fetch-depth: 0
       - run: mkdir public
-      - run: printf "$GITHUB_ACTION_PATH"
-      - run: ls $GITHUB_ACTION_PATH
-      - run: sudo apt-get update && sudo apt-get -y upgrade
-      - run: sudo apt install -y build-essential debhelper dh-python git asciidoc intltool libpython3-dev libssl-dev libsystemd-dev python3-dev pkg-config systemd xsltproc docbook-xsl wget cargo intltool
+      - run: ls ${{env.working-directory}}
+      - run: sudo apt-get update
+      - run: sudo apt install -y build-essential debhelper dh-python git asciidoc intltool libpython3-dev libssl-dev libsystemd-dev python3-dev pkg-config systemd xsltproc docbook-xsl wget cargo
       - run: wget https://source.ipfire.org/releases/libloc/libloc-0.9.16.tar.gz
       - run: echo "2092361f0c76b31e65aed85692c56176996925e1cd5d78d113ab9c53ba27f3fc libloc-0.9.16.tar.gz" | sha256sum -c
       - run: tar xf libloc-0.9.16.tar.gz
       - working-directory: ./libloc-0.9.16
         run: ./autogen.sh
       - working-directory: ./libloc-0.9.16
-        run: ./configure CFLAGS='-g -O0' --prefix=$GITHUB_ACTION_PATH --sysconfdir=/etc --libdir=$GITHUB_ACTION_PATH/lib --with-database-path=$GITHUB_ACTION_PATH/database.db
+        run: ./configure CFLAGS='-g -O0' --prefix=${{env.working-directory}} --sysconfdir=/etc --libdir=${{env.working-directory}}/lib --with-database-path=${{env.working-directory}}/database.db
       - working-directory: ./libloc-0.9.16
         run: make
       - working-directory: ./libloc-0.9.16
         run: make install
-      - run: ls $GITHUB_ACTION_PATH/lib/python3.8/site-packages
+      - run: ls ${{env.working-directory}}/lib/python3.8/site-packages
       - run: git clone --depth 1 https://git.torproject.org/tor.git
-      - run: PYTHONPATH=$GITHUB_ACTION_PATH/lib/python3.8/site-packages location --quiet update
-      - run: PYTHONPATH=$GITHUB_ACTION_PATH/lib/python3.8/site-packages location dump $GITHUB_ACTION_PATH/public/geoip-dump.txt
-      - run: version=$(date --date="$(PYTHONPATH=$GITHUB_ACTION_PATH/lib/python3.8/site-packages location version)" '+%Y%m%dT%H%m%SZ')
+      - run: PYTHONPATH=${{env.working-directory}}/lib/python3.8/site-packages location --quiet update
+      - run: PYTHONPATH=${{env.working-directory}}/lib/python3.8/site-packages location dump ${{env.working-directory}}/public/geoip-dump.txt
+      - run: version=$(date --date="$(PYTHONPATH=${{env.working-directory}}/lib/python3.8/site-packages location version)" '+%Y%m%dT%H%m%SZ')
       - working-directory: ./tor/scripts/maint/geoip/geoip-db-tool
-        run: cargo run --release -- -i $GITHUB_ACTION_PATH/public/geoip-dump.txt
+        run: cargo run --release -- -i ${{env.working-directory}}/public/geoip-dump.txt
       - run: mv ./tor/scripts/maint/geoip/geoip-db-tool/geoip{,6} ./public/
       - run: printf "$version" > ./public/version  
