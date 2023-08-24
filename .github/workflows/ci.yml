@@ -46,12 +46,13 @@ jobs:
         run: make
       - working-directory: ./libloc-0.9.16
         run: sudo make install
-      - run: ls ${{env.working-directory}}/lib/python3.8/site-packages
       - run: git clone --depth 1 https://git.torproject.org/tor.git
-      - run: PYTHONPATH=${{env.working-directory}}/lib/python3.8/site-packages location --quiet update
-      - run: PYTHONPATH=${{env.working-directory}}/lib/python3.8/site-packages location dump ${{env.working-directory}}/public/geoip-dump.txt
-      - run: version=$(date --date="$(PYTHONPATH=${{env.working-directory}}/lib/python3.8/site-packages location version)" '+%Y%m%dT%H%m%SZ')
+      - run: ls ${{env.working-directory}}/lib/python3.10/site-packages
+      - run: PYTHONPATH=${{env.working-directory}}/lib/python3.10/site-packages location --quiet update
+      - run: PYTHONPATH=${{env.working-directory}}/lib/python3.10/site-packages location dump ${{env.working-directory}}/public/geoip-dump.txt
+      - run: version=$(date --date="$(PYTHONPATH=${{env.working-directory}}/lib/python3.10/site-packages location version)" '+%Y%m%dT%H%m%SZ')
       - working-directory: ./tor/scripts/maint/geoip/geoip-db-tool
         run: cargo run --release -- -i ${{env.working-directory}}/public/geoip-dump.txt
       - run: mv ./tor/scripts/maint/geoip/geoip-db-tool/geoip{,6} ./public/
       - run: printf "$version" > ./public/version
+      - run: ls ${{env.working-directory}}/public
