@@ -18,7 +18,7 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     # CI project folder
     env:
@@ -37,6 +37,8 @@ jobs:
       - run: wget https://source.ipfire.org/releases/libloc/libloc-0.9.16.tar.gz
       - run: echo "2092361f0c76b31e65aed85692c56176996925e1cd5d78d113ab9c53ba27f3fc libloc-0.9.16.tar.gz" | sha256sum -c
       - run: tar xf libloc-0.9.16.tar.gz
+      - run: pwd
+      - run: ls
       - run: pushd libloc-0.9.16
       - run: pwd
       - run: ls
