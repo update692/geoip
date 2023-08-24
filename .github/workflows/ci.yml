@@ -9,7 +9,8 @@ on:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
-
+  schedule:
+    - cron: "0 0 * * *"
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -82,7 +83,7 @@ jobs:
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "${{ env.version }}"
-          title: "Release ${{ env.version }}"
+          title: "${{ env.version }}"
           draft: false
           prerelease: false
           files: |
