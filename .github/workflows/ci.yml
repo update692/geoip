@@ -33,13 +33,13 @@ jobs:
           fetch-depth: 0
       - run: mkdir public
       - run: sudo apt update
-      - run: sudo apt install -y build-essential debhelper dh-python git asciidoc intltool libpython3-dev libssl-dev libsystemd-dev python3-dev pkg-config systemd xsltproc docbook-xsl wget cargo
+      - run: sudo apt install -y build-essential debhelper dh-python git asciidoc intltool libpython3-dev libssl-dev libsystemd-dev python3-dev pkg-config systemd xsltproc docbook-xsl wget cargo base-devel
       - run: wget https://source.ipfire.org/releases/libloc/libloc-0.9.16.tar.gz
       - run: echo "2092361f0c76b31e65aed85692c56176996925e1cd5d78d113ab9c53ba27f3fc libloc-0.9.16.tar.gz" | sha256sum -c
       - run: tar xf libloc-0.9.16.tar.gz
       - run: pushd libloc-0.9.16
-      - run: autogen.sh
-      - run: configure CFLAGS='-g -O0' --prefix=/usr --sysconfdir=/etc --libdir=/usr/lib --with-database-path=${{env.working-directory}}/database.db
+      - run: ./autogen.sh
+      - run: ./configure CFLAGS='-g -O0' --prefix=/usr --sysconfdir=/etc --libdir=/usr/lib --with-database-path=${{env.working-directory}}/database.db
       - run: make
       - run: make install
       - run: popd
