@@ -80,7 +80,7 @@ jobs:
       - run: ls ./public
 
       - name: Zip folder
-        run: zip -r -q -j ./geoip.zip ./public/
+        run: zip -r -q -j -9 ./geoip.zip ./public/
 
       - name: Create Release
         id: create_release
