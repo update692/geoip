@@ -2,7 +2,7 @@
 
 Fresh geoip files for Tor Expert Bundle.
 
-[![CI](https://github.com/update692/geoip/actions/workflows/ci.yml/badge.svg)](https://github.com/update692/geoip/actions/workflows/ci.yml)
+[![build](https://github.com/update692/geoip/actions/workflows/ci.yml/badge.svg)](https://github.com/update692/geoip/actions/workflows/ci.yml)
 
 ## Download
 
