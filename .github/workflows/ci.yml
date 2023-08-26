@@ -40,16 +40,16 @@ jobs:
       - run: ls ${{ github.workspace }}
       - run: sudo apt-get update
       - run: sudo apt install -y build-essential debhelper dh-python git asciidoc intltool libpython3-dev libssl-dev libsystemd-dev python3-dev pkg-config systemd xsltproc docbook-xsl wget cargo
-      - run: wget https://source.ipfire.org/releases/libloc/libloc-0.9.16.tar.gz
-      - run: echo "2092361f0c76b31e65aed85692c56176996925e1cd5d78d113ab9c53ba27f3fc libloc-0.9.16.tar.gz" | sha256sum -c
-      - run: tar xf libloc-0.9.16.tar.gz
-      - working-directory: ./libloc-0.9.16
+      - run: wget https://source.ipfire.org/releases/libloc/libloc-0.9.17.tar.gz
+      - run: echo "87f28415c0656351b27bc564cda1dd0ed7cb1dc3fd406492d2b6ad9a2cf1733c libloc-0.9.17.tar.gz" | sha256sum -c
+      - run: tar xf libloc-0.9.17.tar.gz
+      - working-directory: ./libloc-0.9.17
         run: ./autogen.sh
-      - working-directory: ./libloc-0.9.16
+      - working-directory: ./libloc-0.9.17
         run: ./configure CFLAGS='-g -O0' --prefix=/usr --sysconfdir=/etc --libdir=/usr/lib --with-database-path=${{ github.workspace }}/database.db
-      - working-directory: ./libloc-0.9.16
+      - working-directory: ./libloc-0.9.17
         run: make
-      - working-directory: ./libloc-0.9.16
+      - working-directory: ./libloc-0.9.17
         run: sudo make install
       - run: git clone --depth 1 https://git.torproject.org/tor.git
 
