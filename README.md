@@ -12,6 +12,10 @@ Permanent link to latest release data.
 
 `https://github.com/update692/geoip/releases/latest/download/geoip.zip`
 
+## Download tool
+
+https://github.com/update692/geoip-dl
+
 ## Original project
 
 https://gitlab.torproject.org/tpo/network-health/metrics/geoip-data/
